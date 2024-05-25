@@ -1,7 +1,10 @@
 import { createEmail } from "./createEmail.js";
+import { createEmailDetails } from "./createEmailDetails.js";
 import { customAlert } from "./customAlert.js";
+import { readFetch } from "./helpers/readFetch.js";
 import { sendEmailFetch } from "./helpers/sendEmailFetch.js";
 import { showMailboxFetch } from "./helpers/showMailboxFetch.js";
+import { setForm } from "./setForm.js";
 
 document.addEventListener('DOMContentLoaded', function() {
 
@@ -20,10 +23,14 @@ function compose_email() {
   // Show compose view and hide other views
   document.querySelector('#emails-view').style.display = 'none';
   document.querySelector('#compose-view').style.display = 'block';
-  const alertas = document.querySelector("#alerts");
 
 
   // Clear out composition fields
+  setForm({
+    recipients: '',
+    subject: '',
+    body: '',
+  })
   document.querySelector('#compose-recipients').value = '';
   document.querySelector('#compose-subject').value = '';
   document.querySelector('#compose-body').value = '';
@@ -49,9 +56,8 @@ function compose_email() {
       type: response.hasOwnProperty('message') ? 'message' : 'error',
     }
 
-    const alertaDiv = customAlert(newAlert);
-    alertas.innerHTML = '';
-    alertas.append(alertaDiv);
+    customAlert(newAlert);
+    clear();
   })
 
 }
@@ -71,6 +77,19 @@ async function load_mailbox(mailbox) {
   emails.forEach(email => {
     const emailDiv = createEmail(email);
 
+    emailDiv.addEventListener("click", async()=>{
+      const emailDetailsDiv = createEmailDetails(email, load_mailbox, compose_email, mailbox);
+      emailsView.innerHTML="";
+      emailsView.append(emailDetailsDiv);
+      await readFetch(email.id);
+    })
+
     emailsView.append(emailDiv);
   });
+}
+
+const clear = () => {
+  document.querySelector('#compose-recipients').value = '';
+  document.querySelector('#compose-subject').value = '';
+  document.querySelector('#compose-body').value = '';
 }

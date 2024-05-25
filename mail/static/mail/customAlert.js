@@ -5,5 +5,7 @@ export const customAlert = ({message, type})=> {
     ${ message }
     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     `;
-    return alertaDiv;
+    const alertas = document.querySelector("#alerts");
+    alertas.innerHTML = '';
+    alertas.append(alertaDiv);
 }
